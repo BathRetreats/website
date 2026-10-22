@@ -1,0 +1,14 @@
+# Dependencies (reinstalled on deploy)
+node_modules/
+
+# Source photos: master copies live in cloud storage, not the repo
+_originals/
+
+# Secrets
+.env
+.env.*
+
+# OS / editor clutter
+.DS_Store
+.vscode/
+*.log

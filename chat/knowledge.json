@@ -1,0 +1,341 @@
+{
+  "builtAt": "2026-10-21T19:38:35.914Z",
+  "pages": [
+    "index.html",
+    "abbey.html",
+    "manor.html"
+  ],
+  "chunks": [
+    {
+      "id": "index.html#abbey-views-summary-card",
+      "title": "Abbey Views: summary card",
+      "text": "Abbey Views. Best for couples. Location: Bath city centre. Rating 4.91 (218). A stylish apartment for two with views of the 18th-century Abbey, two minutes from the Roman Baths and Thermae Spa. 2 guests, 1 bedroom, 1 bathroom.",
+      "stay": "abbey",
+      "url": "index.html#stays"
+    },
+    {
+      "id": "index.html#longscroft-manor-summary-card",
+      "title": "Longscroft Manor: summary card",
+      "text": "Longscroft Manor. Best for groups & families. Location: Near Bradford-on-Avon, Wiltshire. Rating 4.81 (63). A five-bedroom manor a short drive from Bath, with large gardens, a BBQ, a fire pit and free parking on site. 12 guests, 5 bedrooms, 2.5 bathrooms.",
+      "stay": "manor",
+      "url": "index.html#stays"
+    },
+    {
+      "id": "index.html#bath-retreats-key-figures-for-both-stays",
+      "title": "Bath Retreats: key figures for both stays",
+      "text": "4.89 Average rating across both stays; 281 Guest reviews; 2–12 Guests, from couples to groups; 16:00 Self check-in at both stays.",
+      "stay": "both",
+      "url": "index.html"
+    },
+    {
+      "id": "index.html#things-to-do-bath-abbey",
+      "title": "Things to do: Bath Abbey",
+      "text": "Bath Abbey. 1 min walk from Abbey Views. The view from your window, up close. Admire the fan-vaulted ceiling and the famous \"Jacob's ladder\" west front. Category: history.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Bath+Abbey%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-the-pump-room",
+      "title": "Things to do: The Pump Room",
+      "text": "The Pump Room. 1 min walk from Abbey Views. Georgian elegance for afternoon tea or brunch, with live music and a taste of the spa waters. Category: food history.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=The+Pump+Room%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-the-roman-baths",
+      "title": "Things to do: The Roman Baths",
+      "text": "The Roman Baths. 2 min walk from Abbey Views. The best-preserved Roman spa in northern Europe, with the sacred spring still flowing. The city's must-see. Category: history.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Roman+Baths%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-thermae-bath-spa",
+      "title": "Things to do: Thermae Bath Spa",
+      "text": "Thermae Bath Spa. 2 min walk from Abbey Views. Soak in naturally warm mineral water, with a rooftop pool that looks out across the city. Category: spa.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Thermae+Bath+Spa%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-sally-lunn-s",
+      "title": "Things to do: Sally Lunn's",
+      "text": "Sally Lunn's. 3 min walk from Abbey Views. Bath's famous historic eating house, home of the Sally Lunn bun, in one of the city's oldest houses. Category: food.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Sally+Lunn%27s+Historic+Eating+House%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-theatre-royal-bath",
+      "title": "Things to do: Theatre Royal Bath",
+      "text": "Theatre Royal Bath. 4 min walk from Abbey Views. A beautiful Georgian theatre staging West End tours, plays and pantomime year-round. Category: history.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Theatre+Royal+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-parade-gardens-the-river-avon",
+      "title": "Things to do: Parade Gardens & the River Avon",
+      "text": "Parade Gardens & the River Avon. 5 min walk from Abbey Views. A riverside garden right by Pulteney Bridge. Perfect for a picnic, a deckchair and the weir views. Category: outdoors.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Parade+Gardens%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-pulteney-bridge",
+      "title": "Things to do: Pulteney Bridge",
+      "text": "Pulteney Bridge. 6 min walk from Abbey Views. One of the few bridges in the world lined with shops on both sides. Best photographed from the weir. Category: history outdoors.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Pulteney+Bridge%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-jane-austen-centre",
+      "title": "Things to do: Jane Austen Centre",
+      "text": "Jane Austen Centre. 10 min walk from Abbey Views. Step into Regency Bath and the author's time in the city. Look out for costumed guides on Gay Street. Category: history.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Jane+Austen+Centre%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-green-park-station-market",
+      "title": "Things to do: Green Park Station Market",
+      "text": "Green Park Station Market. 10 min walk from Abbey Views. Local producers, street food and independent stalls under a restored Victorian station roof, at weekends. Category: food.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Green+Park+Station%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-the-royal-crescent-the-circus",
+      "title": "Things to do: The Royal Crescent & The Circus",
+      "text": "The Royal Crescent & The Circus. approx. 15 min walk from Abbey Views. Thirty sweeping Georgian townhouses around a lawn that rolls down to Royal Victoria Park. Go early and you might spot the hot-air balloons. Category: history outdoors.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Royal+Crescent%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-prior-park-landscape-garden",
+      "title": "Things to do: Prior Park Landscape Garden",
+      "text": "Prior Park Landscape Garden. Short bus or taxi ride from Abbey Views. A Palladian garden with a picture-perfect view over the city, and the start of the Bath Skyline countryside trail. Category: outdoors.",
+      "stay": "abbey-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Prior+Park+Landscape+Garden%2C+Bath"
+    },
+    {
+      "id": "index.html#things-to-do-bradford-on-avon",
+      "title": "Things to do: Bradford-on-Avon",
+      "text": "Bradford-on-Avon. Near Longscroft Manor (a short drive). A honey-stone town on the River Avon, with a medieval Tithe Barn, a tiny Saxon church and riverside pubs. Category: near the manor history.",
+      "stay": "manor-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Tithe+Barn%2C+Bradford-on-Avon"
+    },
+    {
+      "id": "index.html#things-to-do-kennet-avon-canal",
+      "title": "Things to do: Kennet & Avon Canal",
+      "text": "Kennet & Avon Canal. Near Longscroft Manor (a short drive). Flat towpath walks and bike rides past narrowboats to the Avoncliff Aqueduct, with canal-side cafés along the way. Category: near the manor outdoors.",
+      "stay": "manor-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Avoncliff+Aqueduct"
+    },
+    {
+      "id": "index.html#things-to-do-iford-manor-gardens",
+      "title": "Things to do: Iford Manor Gardens",
+      "text": "Iford Manor Gardens. Near Longscroft Manor (a short drive). Harold Peto's Italianate terraced garden in a quiet river valley. Opening is seasonal, so check before you go. Category: near the manor outdoors.",
+      "stay": "manor-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Iford+Manor+Gardens"
+    },
+    {
+      "id": "index.html#things-to-do-lacock",
+      "title": "Things to do: Lacock",
+      "text": "Lacock. Near Longscroft Manor (a short drive). A National Trust village and abbey, familiar from film and TV, with a museum dedicated to the birth of photography. Category: near the manor history.",
+      "stay": "manor-area",
+      "url": "index.html#explore",
+      "link": "https://www.google.com/maps/search/?api=1&query=Lacock+Abbey"
+    },
+    {
+      "id": "index.html#things-to-do-in-and-around-bath-overview",
+      "title": "Things to do in and around Bath: overview",
+      "text": "Attractions listed on the site: Bath Abbey, The Pump Room, The Roman Baths, Thermae Bath Spa, Sally Lunn's, Theatre Royal Bath, Parade Gardens & the River Avon, Pulteney Bridge, Jane Austen Centre, Green Park Station Market, The Royal Crescent & The Circus, Prior Park Landscape Garden, Bradford-on-Avon, Kennet & Avon Canal, Iford Manor Gardens, Lacock. Tap any place to open it in Google Maps. Walking times are from Abbey Views. Times are approximate. Opening times and prices change, so check each attraction before you go.",
+      "stay": "both",
+      "url": "index.html#explore"
+    },
+    {
+      "id": "index.html#abbey-views-guest-ratings-and-review-scores",
+      "title": "Abbey Views: guest ratings and review scores",
+      "text": "Abbey Views overall rating 4.91 out of 5, from 218 reviews. Category scores: Cleanliness 5.0, Location 5.0, Accuracy 4.9, Check-in 4.9, Communication 4.9, Value 4.9. Most mentioned: Location (186), View (121), Cleanliness (72), Hospitality (64).",
+      "stay": "abbey",
+      "url": "abbey.html#reviews"
+    },
+    {
+      "id": "index.html#longscroft-manor-guest-ratings-and-review-scores",
+      "title": "Longscroft Manor: guest ratings and review scores",
+      "text": "Longscroft Manor overall rating 4.81 out of 5, from 63 reviews. Category scores: Communication 5.0, Check-in 4.9, Cleanliness 4.8, Accuracy 4.8, Location 4.8, Value 4.7. Most mentioned: Hospitality (28), Location (23), Indoor spaces (17), Family (14).",
+      "stay": "manor",
+      "url": "manor.html#reviews"
+    },
+    {
+      "id": "index.html#faq-both-stays-what-time-are-check-in-and-check-out",
+      "title": "FAQ (Both stays): What time are check-in and check-out?",
+      "text": "What time are check-in and check-out? Check-in is after 16:00 and check-out is before 10:00 at both properties.",
+      "stay": "both",
+      "url": "index.html#faq"
+    },
+    {
+      "id": "index.html#faq-both-stays-how-does-check-in-work",
+      "title": "FAQ (Both stays): How does check-in work?",
+      "text": "How does check-in work? Both stays have self check-in, so you can arrive at your own pace. Abbey Views uses a lockbox and Longscroft Manor a key safe on site. We send full instructions before you travel.",
+      "stay": "both",
+      "url": "index.html#faq"
+    },
+    {
+      "id": "index.html#faq-both-stays-who-looks-after-the-properties",
+      "title": "FAQ (Both stays): Who looks after the properties?",
+      "text": "Who looks after the properties? Both properties are managed by AIR Development Consultancy Ltd. Get in touch before or during your stay and we'll be happy to help.",
+      "stay": "both",
+      "url": "index.html#faq"
+    },
+    {
+      "id": "index.html#faq-abbey-views-are-there-stairs",
+      "title": "FAQ (Abbey Views): Are there stairs?",
+      "text": "Are there stairs? The apartment is on the fourth floor. A lift takes you to the third floor, followed by around 15 stairs to the front door. Please bear this in mind if you have mobility needs or heavy luggage.",
+      "stay": "abbey",
+      "url": "abbey.html#faq"
+    },
+    {
+      "id": "index.html#faq-abbey-views-where-can-i-park",
+      "title": "FAQ (Abbey Views): Where can I park?",
+      "text": "Where can I park? The nearest recommended car parks are Southgate and Manvers Street, both about a 5-minute walk away.",
+      "stay": "abbey",
+      "url": "abbey.html#faq"
+    },
+    {
+      "id": "index.html#faq-abbey-views-can-we-check-in-early-or-leave-late",
+      "title": "FAQ (Abbey Views): Can we check in early or leave late?",
+      "text": "Can we check in early or leave late? Early check-in and late check-out may be available on request. Charges apply.",
+      "stay": "abbey",
+      "url": "abbey.html#faq"
+    },
+    {
+      "id": "index.html#faq-longscroft-manor-is-there-parking",
+      "title": "FAQ (Longscroft Manor): Is there parking?",
+      "text": "Is there parking? Yes, there is ample free parking on site.",
+      "stay": "manor",
+      "url": "manor.html#faq"
+    },
+    {
+      "id": "index.html#faq-longscroft-manor-can-we-bring-our-dog",
+      "title": "FAQ (Longscroft Manor): Can we bring our dog?",
+      "text": "Can we bring our dog? Sorry, dogs are not accepted at Longscroft Manor.",
+      "stay": "manor",
+      "url": "manor.html#faq"
+    },
+    {
+      "id": "index.html#faq-longscroft-manor-is-it-suitable-for-young-children",
+      "title": "FAQ (Longscroft Manor): Is it suitable for young children?",
+      "text": "Is it suitable for young children? Yes. A travel cot and high chair are available on request, and the bunk room is a favourite with kids.",
+      "stay": "manor",
+      "url": "manor.html#faq"
+    },
+    {
+      "id": "index.html#how-to-book-and-check-availability",
+      "title": "How to book and check availability",
+      "text": "To check dates and book, use the \"Plan your stay\" form at the top of any page: choose a property, check-in and check-out dates and the number of guests, then press \"Check availability\". Abbey Views sleeps up to 2. Longscroft Manor sleeps up to 12.",
+      "stay": "both",
+      "url": "index.html#book"
+    },
+    {
+      "id": "index.html#about-bath-retreats-and-who-manages-the-properties",
+      "title": "About Bath Retreats and who manages the properties",
+      "text": "Bath Retreats Abbey Views, Bath Longscroft Manor, Wiltshire Managed by AIR Development Consultancy Ltd.",
+      "stay": "both",
+      "url": "index.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-overview",
+      "title": "Abbey Views: overview",
+      "text": "City apartment · Bath. 4.91 · 218 reviews · Guest favourite. 4.91 · 218 reviews, Bath city centre, Sleeps 2. A light-filled fourth-floor apartment facing the 18th-century Abbey, right in the heart of Bath. Open-plan living, kitchen and dining, a separate bedroom with a king bed, and skylights that flood the place with light. Highlights: 2 min walk to the Roman Baths: Thermae Spa, the Pump Room, cafés and shops on your doorstep. Abbey views: Mentioned in 121 guest reviews. Self check-in: Arrive at your own pace with a lockbox.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-bedrooms-and-where-you-ll-sleep",
+      "title": "Abbey Views: bedrooms and where you'll sleep",
+      "text": "Bedroom: 1 king bed with storage.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-amenities-what-s-included",
+      "title": "Abbey Views: amenities, what's included",
+      "text": "Abbey & city views; Self check-in (lockbox); Fast WiFi; Dedicated workspace; Smart TV; Full kitchen: hob, oven, fridge; Dining table for two; Washing machine; Shower over bath; Hair dryer, toiletries & towels; King bed with storage; Early check-in / late check-out on request.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-location-and-getting-there",
+      "title": "Abbey Views: location and getting there",
+      "text": "2 min walk to the Roman Baths, Thermae Spa and Pump Room. Southgate & Manvers Street car parks, about 5 min walk. Bath Spa railway station within a short stroll.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-key-facts-check-in-check-out-capacity",
+      "title": "Abbey Views: key facts (check-in, check-out, capacity)",
+      "text": "Check-in: After 16:00; Check-out: Before 10:00; Sleeps: Up to 2 guests; Access: 4th floor, lift to 3rd. Rating 4.91 · 218 reviews.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "abbey.html#abbey-views-photo-gallery",
+      "title": "Abbey Views: photo gallery",
+      "text": "The photo gallery shows: Bath Abbey views, The sitting room, King-size bed, Morning coffee with a view, Open-plan living, Fully fitted kitchen, Skylights & natural light, Dining for two, Bath & shower, Rooftop views, Evenings by the Abbey, Bath skyline.",
+      "stay": "abbey",
+      "url": "abbey.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-overview",
+      "title": "Longscroft Manor: overview",
+      "text": "Country manor · Wiltshire. 4.81 · 63 reviews · Sleeps 12. 4.81 · 63 reviews, Near Bradford-on-Avon, Sleeps 12. A handsome five-bedroom manor on the outskirts of Bradford-on-Avon, a short drive from Bath. Two spacious reception rooms, a farmhouse-style kitchen, a dining table for the whole group, and large gardens with a BBQ, outdoor seating and a fire pit. Ideal for family gatherings, reunions and celebration weekends. Highlights: Sleeps 12 across 5 bedrooms: Plus a travel cot and high chair on request. Large gardens: BBQ, outdoor seating and a fire pit for long evenings. Free parking on site: Plenty of space for several cars.",
+      "stay": "manor",
+      "url": "manor.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-bedrooms-and-where-you-ll-sleep",
+      "title": "Longscroft Manor: bedrooms and where you'll sleep",
+      "text": "Bedroom 1: King bed; Bedroom 2: King bed; Bedroom 3: Double bed; Bedroom 4: Bunk beds; Bedroom 5: Twin beds, zip to a king; Extra: 2 Z-beds. One bedroom is en-suite and two have Romeo & Juliet balconies.",
+      "stay": "manor",
+      "url": "manor.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-amenities-what-s-included",
+      "title": "Longscroft Manor: amenities, what's included",
+      "text": "Two reception rooms; TV; Farmhouse-style kitchen; Large fridge; Breakfast area with patio access; Dining table for the group; Roll-top bath; WiFi; Dedicated workspace; Large gardens; BBQ & outdoor seating; Fire pit; Free parking on premises; Self check-in (key safe); Travel cot & high chair on request.",
+      "stay": "manor",
+      "url": "manor.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-location-and-getting-there",
+      "title": "Longscroft Manor: location and getting there",
+      "text": "On the outskirts of Bradford-on-Avon, a short drive from Bath. Countryside views, with the Kennet & Avon Canal nearby. Exact address shared after booking.",
+      "stay": "manor",
+      "url": "manor.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-key-facts-check-in-check-out-capacity",
+      "title": "Longscroft Manor: key facts (check-in, check-out, capacity)",
+      "text": "Check-in: After 16:00; Check-out: Before 10:00; Sleeps: Up to 12 guests; Pets: No dogs, sorry. Rating 4.81 · 63 reviews.",
+      "stay": "manor",
+      "url": "manor.html"
+    },
+    {
+      "id": "manor.html#longscroft-manor-photo-gallery",
+      "title": "Longscroft Manor: photo gallery",
+      "text": "The photo gallery shows: Longscroft Manor, Drawing room, Dining for the whole group, King bedroom, The grounds, Farmhouse kitchen, Second reception room, Made for celebrations, Second king bedroom, Double bedroom, Twin room, Bunk room, Roll-top bath, Romeo & Juliet balcony, Wiltshire countryside, The front porch.",
+      "stay": "manor",
+      "url": "manor.html"
+    }
+  ]
+}

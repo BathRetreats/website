@@ -1,0 +1,18 @@
+{
+  "name": "bath-retreats-chat",
+  "private": true,
+  "type": "module",
+  "description": "RAG guest assistant for the Bath Retreats website",
+  "scripts": {
+    "build:index": "node build-index.mjs",
+    "start": "node build-index.mjs && node server.mjs",
+    "test": "node build-index.mjs && node test-retrieval.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.0.0",
+    "node-html-parser": "^9.0.5"
+  }
+}
