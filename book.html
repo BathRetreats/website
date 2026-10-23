@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book your stay | Bath Retreats</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f1f19">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- Stripe.js must load from Stripe itself (PCI): card details go straight to Stripe, never to our server. -->
+<script src="https://js.stripe.com/v3/" defer></script>
+<script src="book.js" defer></script>
+</head>
+<body class="co-page">
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.4c1.6.8 2.5 2.4 2.5 4.6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+</svg>
+
+<header class="co-top">
+  <a href="index.html" class="nav__logo">Bath Retreats</a>
+  <a href="index.html" class="co-back" id="coBack"><svg class="i"><use href="#i-chev-l"/></svg>Back</a>
+</header>
+
+<main class="co" id="main">
+  <p class="co-status" id="coStatus" role="status">Getting your price…</p>
+  <p class="co-test" id="coTest" hidden>Test mode: use Stripe's test card 4242 4242 4242 4242. No real booking is made.</p>
+
+  <!-- dates gone, invalid link, or direct booking switched off -->
+  <div class="co-msg" id="coError" hidden>
+    <h1>We couldn't continue with this booking</h1>
+    <p id="coErrorText"></p>
+    <a class="btn btn--dark" href="index.html#book" id="coErrorLink">Choose other dates</a>
+  </div>
+
+  <form class="co-grid" id="coForm" novalidate hidden>
+    <div class="co-main">
+      <h1>Confirm and pay</h1>
+
+      <fieldset class="co-card">
+        <legend>Your details</legend>
+        <div class="co-row">
+          <label class="co-field"><span>First name</span><input name="firstName" autocomplete="given-name" required maxlength="60"></label>
+          <label class="co-field"><span>Last name</span><input name="lastName" autocomplete="family-name" required maxlength="60"></label>
+        </div>
+        <label class="co-field"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="120"></label>
+        <label class="co-field"><span>Phone <em>(for check-in details)</em></span><input name="phone" type="tel" autocomplete="tel" maxlength="30"></label>
+      </fieldset>
+
+      <fieldset class="co-card">
+        <legend>Payment</legend>
+        <div id="coPayment"></div>
+        <p class="small"><svg class="i"><use href="#i-lock"/></svg> Payments are processed securely by Stripe; card details never touch this website. You're only charged once your dates are confirmed.</p>
+      </fieldset>
+
+      <label class="co-check"><input type="checkbox" name="terms" required> <span>I agree to the <a href="terms.html" target="_blank">Terms &amp; Conditions</a>, including the cancellation policy, and the <a href="privacy.html" target="_blank">Privacy Policy</a>.</span></label>
+      <label class="co-check"><input type="checkbox" name="marketing"> <span>Send me occasional offers and news about Bath Retreats.</span></label>
+
+      <p class="co-error" id="coFormError" role="alert"></p>
+      <button type="submit" class="btn btn--dark btn--block" id="coPay">Confirm and pay</button>
+    </div>
+
+    <aside class="co-summary" aria-label="Booking summary">
+      <img id="sumImg" alt="">
+      <div class="co-summary__body">
+        <h2 id="sumName"></h2>
+        <ul class="co-facts">
+          <li><svg class="i"><use href="#i-cal"/></svg><span id="sumDates"></span></li>
+          <li><svg class="i"><use href="#i-users"/></svg><span id="sumGuests"></span></li>
+        </ul>
+        <dl class="co-price" id="sumLines"></dl>
+        <dl class="co-price co-price--total"><dt>Total</dt><dd id="sumTotal"></dd></dl>
+        <p class="small" id="sumPolicy"></p>
+      </div>
+    </aside>
+  </form>
+
+  <div class="co-msg co-done" id="coDone" hidden>
+    <span class="co-done__tick"><svg class="i"><use href="#i-check"/></svg></span>
+    <h1>You're booked!</h1>
+    <p class="co-test" id="doneTest" hidden>Test booking: no real reservation was made and no real money was taken.</p>
+    <p>Booking reference <strong id="doneCode"></strong></p>
+    <p id="doneText"></p>
+    <a class="btn btn--dark" href="index.html#explore">Plan things to do in Bath</a>
+  </div>
+</main>
+
+</body>
+</html>

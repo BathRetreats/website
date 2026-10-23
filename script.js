@@ -2,7 +2,7 @@
   "use strict";
 
   // Single source of truth for booking rules.
-  // TODO: swap `url` for the direct-booking page once it exists; dates and guests are appended as query params.
+  // `url` is the Airbnb fallback, used until the server turns on direct booking (book.html).
   const STAYS = {
     abbey: { name: "Abbey Views", max: 2, thumb: "images/abbey/window-view.jpg", url: "https://www.airbnb.co.uk/rooms/865962144112895502" },
     manor: { name: "Longscroft Manor", max: 12, thumb: "images/manor/exterior.jpg", url: "https://www.airbnb.co.uk/rooms/1252796993760210343" },
@@ -70,7 +70,7 @@
     }
 
     const dates = state.start && state.end
-      ? `${fmtShort.format(parse(state.start))} – ${fmtShort.format(parse(state.end))} · ${plural(nightsBetween(state.start, state.end), "night")}`
+      ? `${fmtShort.format(parse(state.start))} – ${fmtShort.format(parse(state.end))} · ${plural(nightsBetween(state.start, state.end), "night")}${priceText()}`
       : "";
     if (!hint.classList.contains("hint--error")) setHint(dates);
     mbarName.textContent = s ? s.name : "Choose a stay";
@@ -131,6 +131,8 @@
     } else if (hint.classList.contains("hint--error")) setHint();
     opts.forEach(o => o.setAttribute("aria-selected", o.dataset.stay === id));
     fStay.classList.remove("is-invalid");
+    loadAvail(id);
+    checkDates();
     advance ? nextStep() : sync();
   }
 
@@ -145,6 +147,55 @@
     sync();
   }
 
+  /* ---- live availability (Guesty, via the server) ---- */
+  // Same server as the chat widget, so hosting the API elsewhere is one setting: its data-endpoint.
+  const API = ($("script[data-endpoint]")?.dataset.endpoint || "/api/chat").replace(/\/chat$/, "");
+  const avail = {}; // stay -> "loading" | "error" | Map(date -> { ok, min, max, cta, ctd })
+  const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); };
+
+  async function loadAvail(stay) {
+    if (avail[stay] && avail[stay] !== "error") return;
+    avail[stay] = "loading";
+    try {
+      const res = await fetch(`${API}/availability?stay=${stay}`);
+      if (!res.ok) throw new Error(res.status);
+      avail[stay] = new Map((await res.json()).days.map(d => [d.date, d]));
+    } catch {
+      avail[stay] = "error"; // fall back to open dates; Airbnb still checks before booking
+    }
+    if (stay !== state.stay) return;
+    checkDates();
+    if (state.pop === "cal") paintCal();
+  }
+  const calFor = () => (avail[state.stay] instanceof Map ? avail[state.stay] : null);
+
+  // Nights are [check-in, check-out): every night must be free, the check-out day itself may be booked.
+  function canCheckIn(s, cal = calFor()) {
+    if (s < today) return false;
+    const day = cal?.get(s);
+    if (!cal || !day) return true; // unknown (no data, or beyond the loaded year)
+    if (!day.ok || day.cta) return false;
+    for (let i = 1; i < day.min; i++) if (cal.get(addDays(s, i))?.ok === false) return false;
+    return true;
+  }
+  function canCheckOut(start, s, cal = calFor()) {
+    if (s <= start) return false;
+    const first = cal?.get(start);
+    if (!cal || !first) return true;
+    const n = nightsBetween(start, s);
+    if (n < first.min || n > first.max || cal.get(s)?.ctd) return false;
+    for (let d = start; d < s; d = addDays(d, 1)) if (cal.get(d)?.ok === false) return false;
+    return true;
+  }
+  // Dates picked before availability arrived, or for the other property, may no longer fit.
+  function checkDates() {
+    if (!state.start || (canCheckIn(state.start) && (!state.end || canCheckOut(state.start, state.end)))) return;
+    state.start = state.end = state.hover = null;
+    state.edge = "in";
+    setHint(`Those dates aren't available at ${STAYS[state.stay].name}. Please choose new dates.`, true);
+    sync();
+  }
+
   /* ---- calendar ---- */
   const icon = id => `<svg class="i"><use href="#i-${id}"/></svg>`;
   function monthHTML(first, idx, count) {
@@ -154,7 +205,7 @@
     let cells = "<span></span>".repeat(lead);
     for (let d = 1; d <= days; d++) {
       const date = new Date(y, m, d), s = iso(date);
-      cells += `<button type="button" class="day" data-date="${s}" aria-label="${fmtLong.format(date)}"${s < today ? " disabled" : ""}><span>${d}</span></button>`;
+      cells += `<button type="button" class="day" data-date="${s}" aria-label="${fmtLong.format(date)}"><span>${d}</span></button>`; // paintCal sets disabled
     }
     const prev = idx === 0 ? `<button type="button" class="cal__arrow" data-nav="-1" aria-label="Previous month"${state.view <= thisMonth ? " disabled" : ""}>${icon("chev-l")}</button>` : '<span class="cal__arrow cal__arrow--ghost"></span>';
     const next = idx === count - 1 ? `<button type="button" class="cal__arrow" data-nav="1" aria-label="Next month">${icon("chev-r")}</button>` : '<span class="cal__arrow cal__arrow--ghost"></span>';
@@ -170,8 +221,11 @@
   function paintCal() {
     const { start, end, hover } = state;
     const effEnd = end || (start && hover > start ? hover : null); // preview range while choosing check-out
+    const choosingOut = state.edge === "out" && start && !end;
     for (const b of $$(".day", calBody)) {
       const s = b.dataset.date;
+      // While choosing check-out, later dates must be valid check-outs; earlier ones restart the stay.
+      b.disabled = choosingOut && s > start ? !canCheckOut(start, s) : !canCheckIn(s);
       b.classList.toggle("is-start", s === start);
       b.classList.toggle("is-end", s === effEnd);
       b.classList.toggle("has-range", !!effEnd && s === start);
@@ -179,7 +233,13 @@
       b.classList.toggle("is-today", s === today);
     }
     const n = start && effEnd ? nightsBetween(start, effEnd) : 0;
-    $(".cal__nights", calBody).textContent = n ? plural(n, "night") : state.edge === "out" && start ? "Now pick your check-out date" : "Pick your check-in date";
+    const min = calFor()?.get(start)?.min;
+    $(".cal__nights", calBody).textContent =
+      n ? plural(n, "night")
+      : choosingOut ? `Now pick your check-out date${min > 1 ? ` · ${min}-night minimum` : ""}`
+      : avail[state.stay] === "loading" ? "Checking availability…"
+      : !state.stay ? "Choose a stay to see available dates"
+      : "Pick your check-in date";
   }
   function pickDate(s) {
     if (state.edge === "in" || !state.start || s <= state.start) {
@@ -199,9 +259,41 @@
     e.preventDefault();
     if (!state.stay) { fStay.classList.add("is-invalid"); setHint("Choose which stay you'd like to book.", true); return openPop("stay"); }
     if (!state.start || !state.end) { (state.start ? fOut : fIn).classList.add("is-invalid"); setHint("Choose your check-in and check-out dates.", true); return openPop("cal"); }
+    if (directBooking) {
+      location.href = `book.html?${new URLSearchParams({ stay: state.stay, in: state.start, out: state.end, guests: state.guests })}`;
+      return;
+    }
     const q = new URLSearchParams({ check_in: state.start, check_out: state.end, adults: state.guests, guests: state.guests });
     window.open(`${STAYS[state.stay].url}?${q}`, "_blank", "noopener");
   });
+  // The server decides whether paid booking on this site is live; until it is, guests book on Airbnb.
+  let directBooking = false;
+  fetch(`${API}/config`).then(r => r.json()).then(c => {
+    directBooking = c.directBooking === true;
+    if (!directBooking) return;
+    $(".search__btn").firstChild.textContent = "Continue to book ";
+    sync(); // price any dates already chosen
+  }).catch(() => {});
+
+  // Live price from Guesty once a stay and both dates are chosen (direct booking only:
+  // Airbnb's own price differs). Cached per stay/dates/guests.
+  const prices = new Map(); // key -> "loading" | "error" | formatted total
+  const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
+  function priceText() {
+    if (!directBooking || !state.stay || !state.start || !state.end) return "";
+    const key = `${state.stay}|${state.start}|${state.end}|${state.guests}`;
+    const v = prices.get(key);
+    if (v === undefined) {
+      prices.set(key, "loading");
+      fetch(`${API}/quote`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stay: state.stay, checkIn: state.start, checkOut: state.end, guests: state.guests }) })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(q => prices.set(key, gbp.format(q.total)))
+        .catch(() => prices.set(key, "error"))
+        .finally(sync);
+    }
+    return v === "loading" || v === undefined ? " · getting price…" : v === "error" ? "" : ` · ${v} total`;
+  }
 
   // "Book" buttons anywhere on the page: preselect the property, bring the widget into view, open the next step.
   function goBook(stay) {
@@ -253,7 +345,7 @@
   // calendar hover preview
   pops.cal.addEventListener("mouseover", e => {
     const d = e.target.closest(".day[data-date]");
-    if (!d || !state.start || state.end || state.edge !== "out" || state.hover === d.dataset.date) return;
+    if (!d || d.disabled || !state.start || state.end || state.edge !== "out" || state.hover === d.dataset.date) return;
     state.hover = d.dataset.date;
     paintCal();
   });

@@ -140,7 +140,7 @@ for (const { file, stay } of PAGES) {
 
   /* ---------- booking + who runs it (same on every page) ---------- */
   add({ page: file, anchor: "book", stay: "both", title: "How to book and check availability",
-    text: `To check dates and book, use the "Plan your stay" form at the top of any page: choose a property, check-in and check-out dates and the number of guests, then press "Check availability". ${txt(root.querySelector(".pop__note"))}` });
+    text: `To check dates and book, use the "Plan your stay" form at the top of any page: choose a property, check-in and check-out dates and the number of guests. The calendar only lets you pick dates that are free, and the total price appears once both dates are chosen. Then press the button to continue to the secure checkout, where you add your details and pay by card, Apple Pay or Google Pay. ${txt(root.querySelector(".pop__note"))}` });
   add({ page: file, stay: "both", title: "About Bath Retreats and who manages the properties",
     text: `${txt(root.querySelector(".footer address"))}.` });
 }

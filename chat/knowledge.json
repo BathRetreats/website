@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-21T19:38:35.914Z",
+  "builtAt": "2026-10-23T14:00:30.983Z",
   "pages": [
     "index.html",
     "abbey.html",
@@ -184,6 +184,13 @@
       "url": "index.html#faq"
     },
     {
+      "id": "index.html#faq-both-stays-how-do-i-book-and-pay",
+      "title": "FAQ (Both stays): How do I book and pay?",
+      "text": "How do I book and pay? Choose a stay and your dates in the booking form to see the full price, including our direct-booking discount. Then add your details and pay securely by card, Apple Pay or Google Pay. Payments are handled by Stripe, and you're only charged once your dates are confirmed.",
+      "stay": "both",
+      "url": "index.html#faq"
+    },
+    {
       "id": "index.html#faq-both-stays-how-does-check-in-work",
       "title": "FAQ (Both stays): How does check-in work?",
       "text": "How does check-in work? Both stays have self check-in, so you can arrive at your own pace. Abbey Views uses a lockbox and Longscroft Manor a key safe on site. We send full instructions before you travel.",
@@ -242,7 +249,7 @@
     {
       "id": "index.html#how-to-book-and-check-availability",
       "title": "How to book and check availability",
-      "text": "To check dates and book, use the \"Plan your stay\" form at the top of any page: choose a property, check-in and check-out dates and the number of guests, then press \"Check availability\". Abbey Views sleeps up to 2. Longscroft Manor sleeps up to 12.",
+      "text": "To check dates and book, use the \"Plan your stay\" form at the top of any page: choose a property, check-in and check-out dates and the number of guests. The calendar only lets you pick dates that are free, and the total price appears once both dates are chosen. Then press the button to continue to the secure checkout, where you add your details and pay by card, Apple Pay or Google Pay. Abbey Views sleeps up to 2. Longscroft Manor sleeps up to 12.",
       "stay": "both",
       "url": "index.html#book"
     },

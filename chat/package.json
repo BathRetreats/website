@@ -5,14 +5,15 @@
   "description": "RAG guest assistant for the Bath Retreats website",
   "scripts": {
     "build:index": "node build-index.mjs",
-    "start": "node build-index.mjs && node server.mjs",
+    "start": "node build-index.mjs && node --env-file-if-exists=.env server.mjs",
     "test": "node build-index.mjs && node test-retrieval.mjs"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.9"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.0.0",
-    "node-html-parser": "^9.0.5"
+    "node-html-parser": "^9.0.5",
+    "stripe": "^23.0.1"
   }
 }

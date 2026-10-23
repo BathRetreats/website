@@ -22,7 +22,8 @@ const CASES = [
   ["Where can we get afternoon tea?", "The Pump Room"],
   ["What can we do near the manor?", c => c.stay === "manor-area", { pageStay: "manor" }],
   ["Is the manor good for kids?", "young children"],
-  ["How do I book?", "How to book"],
+  ["How do I book?", c => /How to book|How do I book/.test(c.title)], // either booking chunk answers it
+  ["How do I pay?", "How do I book and pay"],
   ["Who manages the properties?", "Who looks after"],
   ["What is the rating of Longscroft Manor?", "Longscroft Manor: guest ratings"],
   ["How do I get the keys?", "How does check-in work"],
