@@ -358,39 +358,40 @@
       <p class="mentions">Most mentioned: <b>Hospitality</b> (28), <b>Location</b> (23), <b>Indoor spaces</b> (17), <b>Family</b> (14)</p>
     </div>
 
-    <!-- TODO: replace placeholder quotes with real guest reviews, then delete the "placeholder" labels. -->
-    <div class="slider">
-      <div class="slides">
-        <blockquote class="slide" data-stay="abbey">
-          <svg class="i quote"><use href="#i-quote"/></svg>
-          <p>The view of the Abbey from the window was incredible, and everything was a two-minute walk away. We didn't need the car once.</p>
-          <footer><b>Guest</b><span>Location &amp; view <em class="placeholder">placeholder</em></span></footer>
-        </blockquote>
-        <blockquote class="slide" data-stay="abbey">
-          <svg class="i quote"><use href="#i-quote"/></svg>
-          <p>Spotless, stylish and exactly as pictured. The bed was so comfortable, and check-in was effortless.</p>
-          <footer><b>Guest</b><span>Cleanliness &amp; comfort <em class="placeholder">placeholder</em></span></footer>
-        </blockquote>
-        <blockquote class="slide" data-stay="abbey">
-          <svg class="i quote"><use href="#i-quote"/></svg>
-          <p>The perfect base for a weekend in Bath. Wonderful hosts who answered every question within minutes.</p>
-          <footer><b>Guest</b><span>Hospitality <em class="placeholder">placeholder</em></span></footer>
-        </blockquote>
-        <blockquote class="slide" data-stay="manor">
-          <svg class="i quote"><use href="#i-quote"/></svg>
-          <p>Plenty of room for three generations of our family. The kids loved the garden and we loved the evenings round the fire pit.</p>
-          <footer><b>Guest</b><span>Family gathering <em class="placeholder">placeholder</em></span></footer>
-        </blockquote>
-        <blockquote class="slide" data-stay="manor">
-          <svg class="i quote"><use href="#i-quote"/></svg>
-          <p>A beautiful house with lovely big rooms, a great kitchen and a table that fitted all twelve of us. Easy to get into Bath too.</p>
-          <footer><b>Guest</b><span>Indoor spaces <em class="placeholder">placeholder</em></span></footer>
-        </blockquote>
+    <!-- Guest reviews: sent with the form below, shown here only after approval on admin.html -->
+    <div class="greviews" data-reviews>
+      <div class="greviews__list" aria-live="polite"></div>
+      <div class="greviews__intro">
+        <svg class="i quote"><use href="#i-quote"/></svg>
+        <p class="greviews__title">Stayed with us? We'd love to hear about it.</p>
+        <p class="small">Share a few words about your stay to help future guests. Reviews appear here once our team has checked them.</p>
+        <button type="button" class="btn btn--dark" data-review-open>Write a review</button>
       </div>
-      <div class="slider__ctrl">
-        <button type="button" class="arrow" data-dir="-1" aria-label="Previous review"><svg class="i"><use href="#i-chev-l"/></svg></button>
-        <span class="slider__dots"></span>
-        <button type="button" class="arrow" data-dir="1" aria-label="Next review"><svg class="i"><use href="#i-chev-r"/></svg></button>
+      <form class="rform" novalidate hidden>
+        <p class="rform__for">Your review of <b data-review-stay></b></p>
+        <fieldset class="stars">
+          <legend>Your rating</legend>
+          <div class="stars__row">
+            <input type="radio" name="rating" value="5" id="r5" required><label for="r5" title="5 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">5 stars</span></label>
+            <input type="radio" name="rating" value="4" id="r4"><label for="r4" title="4 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">4 stars</span></label>
+            <input type="radio" name="rating" value="3" id="r3"><label for="r3" title="3 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">3 stars</span></label>
+            <input type="radio" name="rating" value="2" id="r2"><label for="r2" title="2 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">2 stars</span></label>
+            <input type="radio" name="rating" value="1" id="r1"><label for="r1" title="1 star"><svg class="i"><use href="#i-star"/></svg><span class="sr">1 star</span></label>
+          </div>
+        </fieldset>
+        <label class="co-field"><span>Your first name</span><input name="name" maxlength="40" autocomplete="given-name" required></label>
+        <label class="co-field"><span>Your review</span><textarea name="text" rows="4" minlength="20" maxlength="1000" required></textarea></label>
+        <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
+        <label class="co-check"><input type="checkbox" name="consent" required> <span>I agree to my first name and review being shown on this website.</span></label>
+        <p class="co-error" role="alert"></p>
+        <div class="rform__actions">
+          <button type="submit" class="btn btn--dark">Submit review</button>
+          <button type="button" class="linkbtn" data-review-cancel>Cancel</button>
+        </div>
+      </form>
+      <div class="rform__done" hidden>
+        <p class="greviews__title">Thank you!</p>
+        <p class="small">Your review has been sent and will appear here once it's been checked.</p>
       </div>
     </div>
   </div>

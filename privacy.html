@@ -30,6 +30,7 @@
   <ul>
     <li><strong>Booking details:</strong> your name, email address, phone number (if given), your dates and number of guests.</li>
     <li><strong>Payment details:</strong> your card or wallet payment is handled by Stripe. We receive confirmation of payment and limited card information (such as the last four digits), never your full card number.</li>
+    <li><strong>Marketing preference:</strong> whether you asked to hear about offers.</li>
     <li><strong>Messages to our guest assistant:</strong> the questions you type into the "Ask a question" chat.</li>
     <li><strong>Technical information:</strong> your IP address and basic request data, kept in server logs for security and to prevent abuse.</li>
   </ul>
@@ -43,10 +44,12 @@
     <li>To keep financial records (legal obligation).</li>
   </ul>
 
-  <h2>Who we share it with</h2>
+  <h2>Where it's kept, and who we share it with</h2>
+  <p>Your booking and contact details are stored in our own booking database on <mark>[hosting provider]</mark>'s servers in <mark>[region]</mark>, accessible only to us. We share the minimum needed with:</p>
   <ul>
-    <li><strong>Stripe</strong>, our payment processor.</li>
-    <li><strong>Guesty</strong>, the property management system used by <mark>[property manager's business name]</mark>, which manages your reservation, check-in and communication about your stay.</li>
+    <li><strong>Stripe</strong>, our payment processor, which receives your payment details and our booking reference.</li>
+    <li><strong>Guesty</strong>, the calendar system used by <mark>[property manager's business name]</mark>, which receives only your dates and booking reference, not your name or contact details, so the property's calendar shows the dates as booked.</li>
+    <li><strong>Resend</strong> and <strong>Twilio</strong>, which deliver our emails and text messages to you.</li>
     <li><strong>Anthropic</strong>, which provides the AI behind the guest assistant. Your chat messages are sent to it to generate answers. Please don't include sensitive personal information in the chat.</li>
     <li><strong>Our website host</strong>, <mark>[hosting provider]</mark>.</li>
     <li><strong>Google Fonts</strong>, which serves the website's typeface and receives your IP address when pages load.</li>
@@ -54,7 +57,7 @@
   <p>Some of these providers process data outside the UK. Where they do, they use safeguards approved under UK law, such as the International Data Transfer Agreement or adequacy regulations. We never sell your information.</p>
 
   <h2>How long we keep it</h2>
-  <p>Booking and payment records are kept for <mark>6 years</mark> for accounting and legal purposes. Marketing preferences are kept until you unsubscribe. Server logs are kept for <mark>[30 days]</mark>.</p>
+  <p>Booking and payment records are kept for <mark>6 years</mark> for accounting and legal purposes. If you start a booking but don't pay, your details are deleted after 7 days. "Pay on your phone" links and the details saved with them are deleted after 24 hours. Marketing preferences are kept until you unsubscribe. Server logs are kept for <mark>[30 days]</mark>.</p>
 
   <h2>Your rights</h2>
   <p>You can ask to access, correct or delete your information, to restrict or object to how we use it, or to receive a copy of it. Contact us at <mark>[email]</mark>. If you're unhappy with how we handle your information, you can complain to the Information Commissioner's Office at <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.</p>

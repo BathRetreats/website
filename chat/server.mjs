@@ -15,6 +15,12 @@
 //   STRIPE_SECRET_KEY / STRIPE_PUBLISHABLE_KEY  our Stripe account (sk_test_/pk_test_ for testing)
 //   STRIPE_WEBHOOK_SECRET  whsec_... for /api/stripe-webhook (finishes bookings if the guest's browser drops)
 //   DIRECT_BOOKING=1     take paid bookings on the site (otherwise guests are sent to Airbnb)
+//   ADMIN_PASSWORD       password for admin.html (bookings and review approval)
+//   GUESTY_GUEST_EMAIL   placeholder email on direct bookings' Guesty reservations (guest details stay in our database)
+//   DATABASE_PATH        SQLite file (default chat/data/app.db); must be on a persistent, backed-up disk in production
+//   PUBLIC_URL           the site's address, used in links sent by email/SMS (default http://localhost:PORT)
+//   RESEND_API_KEY + EMAIL_FROM                        email for "continue on your phone" links
+//   TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_FROM  SMS for the same links
 //
 // Locally these are read from chat/.env (gitignored); see .env.example.
 
@@ -26,6 +32,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import { buildIndex, search } from "./retrieval.mjs";
 import * as guesty from "./guesty.mjs";
 import * as payments from "./payments.mjs";
+import * as reviews from "./reviews.mjs";
+import * as bookings from "./bookings.mjs";
+import * as handoffs from "./handoffs.mjs";
+import * as notify from "./notify.mjs";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SITE = path.resolve(here, "..");
@@ -222,12 +233,12 @@ async function handleAvailability(req, res) {
 /* ---------- direct booking: /api/config, /api/quote, /api/checkout, /api/book ---------- */
 // Off until DIRECT_BOOKING=1 with Stripe keys set; until then the booking form sends guests
 // to Airbnb. The site also needs its Terms and Privacy pages before going live.
-const DIRECT_BOOKING = process.env.DIRECT_BOOKING === "1" && guesty.configured && payments.configured;
+const DIRECT_BOOKING = process.env.DIRECT_BOOKING === "1" && guesty.configured && payments.configured && payments.guestyPlaceholderConfigured;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const QUOTE_ID = /^[a-f0-9]{24}$/;
 
 function handleConfig(req, res) {
-  json(res, 200, { directBooking: DIRECT_BOOKING, ...(DIRECT_BOOKING ? { stripeKey: payments.publishableKey, testMode: payments.testMode } : {}) });
+  json(res, 200, { directBooking: DIRECT_BOOKING, ...(DIRECT_BOOKING ? { stripeKey: payments.publishableKey, testMode: payments.testMode, handoff: HANDOFF } : {}) });
 }
 
 // Errors worth telling the guest about; anything else gets the fallback message.
@@ -254,22 +265,27 @@ async function handleQuote(req, res) {
   }
 }
 
+// The guest's name, email and phone from a checkout form, trimmed; null if invalid.
+function parseGuest(g = {}) {
+  const text = (v, max) => typeof v === "string" && v.trim().length > 0 && v.length <= max;
+  if (!text(g.firstName, 60) || !text(g.lastName, 60) || !text(g.email, 120) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.email.trim()) || (g.phone && !text(g.phone, 30))) return null;
+  return { firstName: g.firstName.trim(), lastName: g.lastName.trim(), email: g.email.trim(), ...(g.phone?.trim() ? { phone: g.phone.trim() } : {}) };
+}
+
 // Guest details + quote -> a Stripe payment to confirm in the browser.
 async function handleCheckout(req, res) {
   if (!DIRECT_BOOKING) return json(res, 503, { error: "Direct booking isn't available yet." });
   if (rateLimited(clientIp(req), "checkout", 10)) return json(res, 429, { error: "Too many booking attempts. Please wait a few minutes and try again." });
   let b;
   try { b = await readJson(req); } catch (e) { return json(res, e.status || 400, { error: e.message }); }
-  const g = b.guest || {};
-  const text = (v, max) => typeof v === "string" && v.trim().length > 0 && v.length <= max;
   if (!QUOTE_ID.test(b.quoteId)) return json(res, 400, { error: "Invalid booking request." });
-  if (!text(g.firstName, 60) || !text(g.lastName, 60) || !text(g.email, 120) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.email.trim()) || (g.phone && !text(g.phone, 30)))
-    return json(res, 400, { error: "Please check your name, email and phone number." });
+  const guest = parseGuest(b.guest);
+  if (!guest) return json(res, 400, { error: "Please check your name, email and phone number." });
   if (b.acceptedTerms !== true) return json(res, 400, { error: "Please accept the terms and privacy policy." });
-  const guest = { firstName: g.firstName.trim(), lastName: g.lastName.trim(), email: g.email.trim(), ...(g.phone ? { phone: g.phone.trim() } : {}) };
   try {
     const quote = await guesty.getQuote(b.quoteId); // the price comes from Guesty, not the request
-    json(res, 200, await payments.startPayment(quote, guest, { marketing: b.marketing === true }));
+    const booking = bookings.create({ quote, guest, marketing: b.marketing === true, test: payments.testMode });
+    json(res, 200, await payments.startPayment(booking));
   } catch (err) {
     bookingError(res, err, "We couldn't start the payment. Please try again.");
   }
@@ -298,6 +314,129 @@ async function handleStripeWebhook(req, res) {
     console.error("[webhook]", err.message);
     json(res, 400, { error: "Invalid webhook" });
   }
+}
+
+/* ---------- continue on your phone: /api/handoff ---------- */
+// Saves the checkout details for 24h and sends a short link by email and SMS. In Stripe test
+// mode without email/SMS keys, the messages are printed to this console instead.
+const PUBLIC_URL = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
+const HANDOFF_LOG_ONLY = payments.testMode;
+const HANDOFF = DIRECT_BOOKING && (notify.emailEnabled || notify.smsEnabled || HANDOFF_LOG_ONLY);
+const HANDOFF_ID = /^[A-Za-z0-9]{12}$/;
+const maskEmail = e => e.replace(/^(.)[^@]*(@.*)$/, "$1•••$2");
+const shortDate = s => new Date(`${s}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+
+async function handleHandoffCreate(req, res) {
+  if (!HANDOFF) return json(res, 503, { error: "Sending a payment link isn't available right now." });
+  if (rateLimited(clientIp(req), "handoff", 3)) return json(res, 429, { error: "You've requested a few links already. Please wait a few minutes." });
+  let b;
+  try { b = await readJson(req); } catch (e) { return json(res, e.status || 400, { error: e.message }); }
+  if (!QUOTE_ID.test(b.quoteId)) return json(res, 400, { error: "Invalid request." });
+  const guest = parseGuest(b.guest);
+  if (!guest) return json(res, 400, { error: "Please fill in your name and a valid email address first." });
+  const mobile = guest.phone ? notify.ukMobile(guest.phone) : null;
+  if (guest.phone && !mobile) return json(res, 400, { error: "We can only text UK mobile numbers (07…). Clear the phone field to get the link by email only." });
+  const canEmail = notify.emailEnabled || HANDOFF_LOG_ONLY, canSms = Boolean(mobile) && (notify.smsEnabled || HANDOFF_LOG_ONLY);
+  if (!canEmail && !canSms) return json(res, 400, { error: "Add your UK mobile number and we'll text you the link." });
+  if (notify.recipientLimited(guest.email.toLowerCase()) || (mobile && notify.recipientLimited(mobile)))
+    return json(res, 429, { error: "We've already sent a few links to these details today. Please check your email or messages." });
+
+  try {
+    const quote = await guesty.getQuote(b.quoteId);
+    const id = handoffs.create({ stay: quote.stay, checkIn: quote.checkIn, checkOut: quote.checkOut, guests: quote.guests, guest, marketing: b.marketing === true });
+    const link = `${PUBLIC_URL}/book.html?resume=${id}`;
+    const stayName = guesty.NAMES[quote.stay];
+    const when = `${shortDate(quote.checkIn)} – ${shortDate(quote.checkOut)}`;
+    const total = new Intl.NumberFormat("en-GB", { style: "currency", currency: quote.currency }).format(quote.total);
+    const sentTo = {};
+    const log = { logOnly: HANDOFF_LOG_ONLY };
+
+    if (canEmail) {
+      const text = `Hi ${guest.firstName},\n\nHere's your link to finish booking ${stayName} (${when}, ${total}):\n${link}\n\nYour details are filled in, so you only need to pay. The link works for 24 hours; dates aren't held until you've paid.\n\nBath Retreats`;
+      const esc = v => v.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+      const html = `<p>Hi ${esc(guest.firstName)},</p><p>Here's your link to finish booking <b>${stayName}</b> (${when}, ${total}).</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#0f1f19;color:#fff;text-decoration:none;font-weight:600">Continue to payment</a></p><p>Your details are filled in, so you only need to pay. The link works for 24 hours; dates aren't held until you've paid.</p><p>Bath Retreats</p>`;
+      await notify.sendEmail({ to: guest.email, subject: `Finish booking ${stayName}`, text, html }, log);
+      sentTo.email = maskEmail(guest.email);
+    }
+    if (canSms) {
+      await notify.sendSms({ to: mobile, body: `Bath Retreats: finish booking ${stayName} (${when}, ${total}) here: ${link}` }, log)
+        .then(() => { sentTo.sms = `•••• ${mobile.slice(-4)}`; })
+        .catch(err => console.error("[handoff] SMS failed:", err.message)); // the email still got through
+    }
+    json(res, 200, { sentTo });
+  } catch (err) {
+    console.error("[handoff]", err.message);
+    if (err.guestyStatus === 404) return json(res, 410, { error: "This price has expired. Please reload the page." });
+    json(res, 502, { error: "We couldn't send the link right now. Please try again or pay here instead." });
+  }
+}
+
+function handleHandoffGet(req, res, id) {
+  if (rateLimited(clientIp(req), "handoff-get", 30)) return json(res, 429, { error: "Too many requests." });
+  const h = HANDOFF_ID.test(id) ? handoffs.get(id) : null;
+  if (!h) return json(res, 404, { error: "This link has expired. Please choose your dates again." });
+  const { stay, checkIn, checkOut, guests, guest, marketing } = h;
+  json(res, 200, { stay, checkIn, checkOut, guests, guest, marketing });
+}
+
+/* ---------- guest reviews: /api/reviews, /api/admin/reviews ---------- */
+const STAYS = Object.keys(guesty.LISTINGS);
+
+function handleReviewList(req, res) {
+  const stay = new URL(req.url, "http://x").searchParams.get("stay");
+  if (!STAYS.includes(stay)) return json(res, 400, { error: "stay must be abbey or manor" });
+  json(res, 200, { reviews: reviews.approved(stay) });
+}
+
+async function handleReviewSubmit(req, res) {
+  if (rateLimited(clientIp(req), "review", 3)) return json(res, 429, { error: "You've sent a few reviews already. Please try again later." });
+  let b;
+  try { b = await readJson(req); } catch (e) { return json(res, e.status || 400, { error: e.message }); }
+  if (b.website) return json(res, 200, { ok: true }); // honeypot field: bots fill it in, people never see it
+  const name = typeof b.name === "string" ? b.name.trim() : "";
+  const text = typeof b.text === "string" ? b.text.trim() : "";
+  const rating = Number(b.rating);
+  if (!STAYS.includes(b.stay) || !Number.isInteger(rating) || rating < 1 || rating > 5) return json(res, 400, { error: "Please choose a star rating." });
+  if (name.length < 1 || name.length > 40) return json(res, 400, { error: "Please add your first name." });
+  if (text.length < 20 || text.length > 1000) return json(res, 400, { error: "Please write between 20 and 1,000 characters." });
+  if (b.consent !== true) return json(res, 400, { error: "Please agree to your review being shown on the website." });
+  try {
+    reviews.add({ stay: b.stay, name, rating, text });
+    json(res, 200, { ok: true });
+  } catch (err) {
+    json(res, err.status || 500, { error: "We couldn't save your review right now. Please try again later." });
+  }
+}
+
+// admin.html sends the password as a bearer token. Compare hashes in constant time.
+const ADMIN_HASH = process.env.ADMIN_PASSWORD ? createHash("sha256").update(process.env.ADMIN_PASSWORD).digest() : null;
+function isAdmin(req) {
+  const given = (req.headers.authorization || "").replace(/^Bearer /, "");
+  return Boolean(ADMIN_HASH && given) && timingSafeEqual(createHash("sha256").update(given).digest(), ADMIN_HASH);
+}
+
+// Shared gate for /api/admin/*: returns true if the request may continue.
+function adminGate(req, res) {
+  if (!ADMIN_HASH) { json(res, 503, { error: "Set ADMIN_PASSWORD in chat/.env to use the admin page." }); return false; }
+  if (rateLimited(clientIp(req), "admin", 60)) { json(res, 429, { error: "Too many requests. Wait a few minutes." }); return false; }
+  if (!isAdmin(req)) { json(res, 401, { error: "Wrong password." }); return false; }
+  return true;
+}
+
+function handleAdminBookings(req, res) {
+  if (!adminGate(req, res)) return;
+  json(res, 200, { bookings: bookings.list() });
+}
+
+async function handleAdminReviews(req, res, pathname) {
+  if (!adminGate(req, res)) return;
+  if (req.method === "GET") return json(res, 200, { reviews: reviews.all() });
+  const id = pathname.split("/")[4];
+  let b;
+  try { b = await readJson(req); } catch (e) { return json(res, e.status || 400, { error: e.message }); }
+  if (!["approve", "reject", "delete"].includes(b.action)) return json(res, 400, { error: "action must be approve, reject or delete" });
+  if (!reviews.moderate(id, b.action)) return json(res, 404, { error: "Review not found" });
+  json(res, 200, { ok: true });
 }
 
 /* ---------- static site ---------- */
@@ -334,6 +473,18 @@ http.createServer((req, res) => {
     return json(res, 405, { error: "Use GET" });
   }
   if (pathname === "/api/config") return handleConfig(req, res);
+  if (pathname === "/api/handoff" && req.method === "POST") return handleHandoffCreate(req, res).catch(e => { console.error(e); if (!res.headersSent) json(res, 500, { error: "Server error" }); });
+  if (pathname.startsWith("/api/handoff/") && req.method === "GET") return handleHandoffGet(req, res, pathname.split("/")[3]);
+  if (pathname === "/api/reviews") {
+    if (req.method === "GET") return handleReviewList(req, res);
+    if (req.method === "POST") return handleReviewSubmit(req, res).catch(e => { console.error(e); if (!res.headersSent) json(res, 500, { error: "Server error" }); });
+    return json(res, 405, { error: "Use GET or POST" });
+  }
+  if (pathname === "/api/admin/bookings" && req.method === "GET") return handleAdminBookings(req, res);
+  if (pathname === "/api/admin/reviews" || pathname.startsWith("/api/admin/reviews/")) {
+    if (req.method !== "GET" && req.method !== "POST") return json(res, 405, { error: "Use GET or POST" });
+    return handleAdminReviews(req, res, pathname).catch(e => { console.error(e); if (!res.headersSent) json(res, 500, { error: "Server error" }); });
+  }
   const bookingRoutes = { "/api/quote": handleQuote, "/api/checkout": handleCheckout, "/api/book": handleBook, "/api/stripe-webhook": handleStripeWebhook };
   if (bookingRoutes[pathname]) {
     if (req.method === "OPTIONS") { res.writeHead(204, corsHeaders()); return res.end(); }
@@ -346,4 +497,14 @@ http.createServer((req, res) => {
 }).listen(PORT, () => {
   console.log(`Bath Retreats running at http://localhost:${PORT}  (${chunks.length} knowledge chunks, model ${MOCK ? "MOCK" : MODEL})`);
   if (!MOCK && !hasKey) console.warn("  ! ANTHROPIC_API_KEY is not set: the chat will reply with a configuration message. Use CHAT_MOCK=1 to demo the UI.");
+  if (DIRECT_BOOKING) console.log(`  Direct booking ON (Stripe ${payments.testMode ? "TEST mode: no real Guesty reservations" : "LIVE"})${payments.webhookConfigured ? "" : "; no STRIPE_WEBHOOK_SECRET, so the backup webhook is off"}`);
+  else {
+    const missing = [
+      !guesty.configured && "GUESTY_CLIENT_ID/GUESTY_CLIENT_SECRET",
+      !payments.configured && "STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY (same account and mode)",
+      !payments.guestyPlaceholderConfigured && "GUESTY_GUEST_EMAIL (needed with live Stripe keys)",
+      process.env.DIRECT_BOOKING !== "1" && 'DIRECT_BOOKING="1"',
+    ].filter(Boolean);
+    console.log(`  Direct booking OFF (guests are sent to Airbnb). Missing in chat/.env: ${missing.join(", ")}`);
+  }
 });

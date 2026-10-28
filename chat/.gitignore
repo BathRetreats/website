@@ -1,3 +1,7 @@
 node_modules/
 .env
 .guesty-token.json
+data/
+*.db
+*.db-wal
+*.db-shm

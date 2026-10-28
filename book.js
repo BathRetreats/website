@@ -16,9 +16,9 @@
   const $ = s => document.querySelector(s);
   const params = new URLSearchParams(location.search);
   const req = { stay: params.get("stay"), checkIn: params.get("in"), checkOut: params.get("out"), guests: Number(params.get("guests")) || 1 };
-  const stay = STAYS[req.stay];
-  // Where Stripe returns the guest after a redirect-based check (e.g. some 3D Secure flows).
-  const returnUrl = `${location.origin}${location.pathname}?${new URLSearchParams({ stay: req.stay, in: req.checkIn, out: req.checkOut, guests: req.guests })}`;
+  let stay = STAYS[req.stay]; // set from the saved details when opened from a "pay on your phone" link
+  // This page's plain address for the current stay; Stripe also returns here after a redirect-based check (some 3D Secure flows).
+  const returnUrl = () => `${location.origin}${location.pathname}?${new URLSearchParams({ stay: req.stay, in: req.checkIn, out: req.checkOut, guests: req.guests })}`;
 
   const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const fmtDay = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short" });
@@ -43,18 +43,34 @@
     $("#coError").hidden = false;
   }
 
-  if (stay) $("#coBack").href = stay.page;
-
   let quote, stripe, elements, busy = false;
 
+  // Opened from a "pay on your phone" link: restore the stay and fill in the guest's details.
+  async function resume(id) {
+    const res = await fetch(`${API}/handoff/${encodeURIComponent(id)}`);
+    const h = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(h.error || "This link has expired. Please choose your dates again.");
+    Object.assign(req, { stay: h.stay, checkIn: h.checkIn, checkOut: h.checkOut, guests: h.guests });
+    stay = STAYS[h.stay];
+    const form = $("#coForm");
+    for (const k of ["firstName", "lastName", "email", "phone"]) form.elements[k].value = h.guest[k] || "";
+    form.elements.marketing.checked = h.marketing === true;
+    history.replaceState(null, "", returnUrl()); // drop the link id from the address bar and history
+  }
+
   async function start() {
+    const resumeId = params.get("resume");
+    if (resumeId) {
+      try { await resume(resumeId); } catch (err) { return fail(err.message, { link: "index.html#book", label: "Choose your dates" }); }
+    }
+    if (stay) $("#coBack").href = stay.page;
     if (!stay || !/^\d{4}-\d{2}-\d{2}$/.test(req.checkIn || "") || !/^\d{4}-\d{2}-\d{2}$/.test(req.checkOut || "") || req.checkOut <= req.checkIn)
       return fail("This booking link is missing the property or dates.");
 
     // Back from a Stripe redirect: the card is authorised, so finish the booking.
     const returned = params.get("payment_intent");
     if (returned) {
-      history.replaceState(null, "", returnUrl);
+      history.replaceState(null, "", returnUrl());
       return finish(returned);
     }
 
@@ -65,6 +81,7 @@
       return location.replace(`${stay.airbnb}?${q}`);
     }
     $("#coTest").hidden = !config.testMode;
+    $("#coHandoff").hidden = !config.handoff || Boolean(resumeId); // already on the phone
 
     try {
       quote = await post("/quote", req);
@@ -86,7 +103,7 @@
         variables: { fontFamily: "Inter, system-ui, sans-serif", colorPrimary: "#0f1f19", colorText: "#0f1f19", colorDanger: "#c0392b", borderRadius: "14px", spacingUnit: "4px" },
       },
     });
-    // Name, email and phone come from the form above, so Stripe doesn't ask again.
+    // Name comes from the form above; email and phone aren't collected for Stripe at all.
     elements.create("payment", { fields: { billingDetails: { name: "never", email: "never", phone: "never" } } }).mount("#coPayment");
 
     setStatus("");
@@ -123,15 +140,40 @@
     try {
       const booking = await post("/book", { paymentIntentId });
       setStatus("");
+      $("#coTest").hidden = true; // the done screen has its own test notice
       $("#doneCode").textContent = booking.reference;
       $("#doneTest").hidden = !booking.test;
-      $("#doneText").textContent = `Your stay at ${STAYS[booking.stay]?.name || stay.name} is confirmed, and a receipt is on its way to ${booking.email}. We can't wait to welcome you.`;
+      $("#doneText").textContent = `Your stay at ${STAYS[booking.stay]?.name || stay.name} is confirmed, and a confirmation email is on its way to ${booking.email}. We can't wait to welcome you.`;
       $("#coDone").hidden = false;
       scrollTo({ top: 0 });
     } catch (err) {
       fail(err.message, err.status === 409 || err.status === 410 ? {} : { link: stay ? stay.page : "index.html", label: "Back to the property" });
     }
   }
+
+  // "Rather pay on your phone?": text/email a link with these details filled in.
+  const setHandoffError = text => { $("#coHandoffError").textContent = text; };
+  $("#coHandoffBtn").addEventListener("click", async () => {
+    const form = $("#coForm"), btn = $("#coHandoffBtn");
+    const f = Object.fromEntries(new FormData(form));
+    for (const k of ["firstName", "lastName", "email"]) {
+      if (!form.elements[k].checkValidity()) { setHandoffError("Fill in your name and email first, plus your UK mobile to get a text."); return form.elements[k].focus(); }
+    }
+    btn.disabled = true;
+    setHandoffError("");
+    try {
+      const guest = { firstName: f.firstName.trim(), lastName: f.lastName.trim(), email: f.email.trim(), ...(f.phone.trim() ? { phone: f.phone.trim() } : {}) };
+      const { sentTo } = await post("/handoff", { quoteId: quote.quoteId, guest, marketing: f.marketing === "on" });
+      const to = [sentTo.sms && `your mobile (${sentTo.sms})`, sentTo.email && `${sentTo.email}`].filter(Boolean).join(" and ");
+      $("#coHandoffText").textContent = `Link sent to ${to}. Open it on your phone to pay; it works for 24 hours. You can also still pay here.`;
+      $("#coHandoff").classList.add("is-sent");
+      btn.textContent = "Send again";
+    } catch (err) {
+      setHandoffError(err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   $("#coForm").addEventListener("submit", async e => {
     e.preventDefault();
@@ -159,8 +201,9 @@
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements, clientSecret,
         confirmParams: {
-          return_url: returnUrl,
-          payment_method_data: { billing_details: { name: `${guest.firstName} ${guest.lastName}`, email: guest.email, phone: guest.phone || "" } },
+          return_url: returnUrl(),
+          // Stripe gets only the cardholder name (used for card checks); email and phone stay in our database.
+          payment_method_data: { billing_details: { name: `${guest.firstName} ${guest.lastName}`, email: null, phone: null } },
         },
         redirect: "if_required",
       });

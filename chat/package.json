@@ -9,7 +9,7 @@
     "test": "node build-index.mjs && node test-retrieval.mjs"
   },
   "engines": {
-    "node": ">=22.9"
+    "node": ">=22.13"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.0.0",

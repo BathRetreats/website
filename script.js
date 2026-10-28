@@ -333,7 +333,6 @@
 
     if ((el = t.closest(".tab[data-filter]"))) return filterPlaces(el);
     if ((el = t.closest("[data-rtab]"))) return showReviews(el.dataset.rtab);
-    if ((el = t.closest(".arrow[data-dir]"))) { showSlide(slideIdx + Number(el.dataset.dir)); return autoSlide(); }
     if ((el = t.closest(".mosaic figure, .mosaic__all"))) {
       const gallery = el.closest(".mosaic");
       return openLightbox(gallery, el.matches("figure") ? $$("figure", gallery).indexOf(el) : 0);
@@ -400,28 +399,74 @@
   });
 
   /* =========================================================
-     Reviews: property tabs + slider
+     Reviews: property tabs, approved guest reviews, review form
      ========================================================= */
-  const scorePanels = $$(".scores"), allSlides = $$(".slide"), dotsWrap = $(".slider__dots");
-  let slides = [], slideIdx = 0, timer;
+  const scorePanels = $$(".scores"), greviews = $("[data-reviews]");
+  const reviewLists = {}; // stay -> promise of approved reviews
+  const fmtReviewDate = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" });
+  let reviewStay = PAGE_STAY || "abbey";
+
   function showReviews(stay) {
+    reviewStay = stay;
     $$("[data-rtab]").forEach(b => b.setAttribute("aria-selected", b.dataset.rtab === stay));
     scorePanels.forEach(p => { p.hidden = p.dataset.stay !== stay; });
-    slides = allSlides.filter(s => s.dataset.stay === stay);
-    dotsWrap.innerHTML = "<i></i>".repeat(slides.length);
-    showSlide(0);
-    autoSlide();
+    if (!greviews) return;
+    $("[data-review-stay]", greviews).textContent = STAYS[stay].name;
+    renderGuestReviews();
   }
-  function showSlide(n) {
-    slideIdx = (n + slides.length) % slides.length;
-    allSlides.forEach(s => s.classList.toggle("is-active", s === slides[slideIdx]));
-    [...dotsWrap.children].forEach((d, i) => d.classList.toggle("is-active", i === slideIdx));
+  async function renderGuestReviews() {
+    const stay = reviewStay;
+    reviewLists[stay] ??= fetch(`${API}/reviews?stay=${stay}`).then(r => r.ok ? r.json() : { reviews: [] }).then(d => d.reviews).catch(() => []);
+    const list = await reviewLists[stay];
+    if (stay !== reviewStay) return; // the guest switched tabs meanwhile
+    $(".greviews__list", greviews).replaceChildren(...list.slice(0, 3).map(r => {
+      // textContent only: review text comes from the public, never insert it as HTML
+      const q = document.createElement("blockquote");
+      q.className = "greview";
+      q.innerHTML = `<span class="greview__stars" aria-label="${r.rating} out of 5 stars">${icon("star").repeat(r.rating)}</span><p></p><footer><b></b><span></span></footer>`;
+      $("p", q).textContent = r.text;
+      $("b", q).textContent = r.name;
+      $("footer span", q).textContent = fmtReviewDate.format(parse(r.date));
+      return q;
+    }));
   }
-  function autoSlide() {
-    clearInterval(timer);
-    if (!reduce) timer = setInterval(() => showSlide(slideIdx + 1), 7000);
+  function reviewForm(open) {
+    const form = $(".rform", greviews);
+    form.hidden = !open;
+    $(".greviews__intro", greviews).hidden = open;
+    $(".rform__done", greviews).hidden = true;
+    if (open) { $(".co-error", form).textContent = ""; $("input[name=rating]", form).focus(); }
   }
-  showReviews(PAGE_STAY || "abbey");
+  greviews?.addEventListener("click", e => {
+    if (e.target.closest("[data-review-open]")) reviewForm(true);
+    if (e.target.closest("[data-review-cancel]")) reviewForm(false);
+  });
+  greviews?.addEventListener("input", () => { $(".rform .co-error", greviews).textContent = ""; });
+  greviews?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const form = e.target, err = $(".co-error", form), btn = $("button[type=submit]", form);
+    const f = Object.fromEntries(new FormData(form));
+    const problem = !f.rating ? "Please choose a star rating."
+      : !f.name.trim() ? "Please add your first name."
+      : f.text.trim().length < 20 ? "Please write at least 20 characters."
+      : !f.consent ? "Please agree to your review being shown on the website." : "";
+    if (problem) { err.textContent = problem; return; }
+    btn.disabled = true;
+    err.textContent = "";
+    try {
+      const res = await fetch(`${API}/reviews`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stay: reviewStay, rating: Number(f.rating), name: f.name.trim(), text: f.text.trim(), consent: true, website: f.website }) });
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Something went wrong. Please try again.");
+      form.reset();
+      form.hidden = true;
+      $(".rform__done", greviews).hidden = false;
+    } catch (ex) {
+      err.textContent = ex.message;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+  showReviews(reviewStay);
 
   /* =========================================================
      Lightbox (per-property galleries, keyboard + swipe)

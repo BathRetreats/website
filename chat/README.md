@@ -42,6 +42,40 @@ With `DIRECT_BOOKING=1` and Stripe keys set, the booking form shows the Guesty p
 
 **Before going live:** live Stripe keys; a webhook endpoint in Stripe for `payment_intent.amount_capturable_updated` with its `whsec_` secret; the manager sets the Booking Engine API instance to accept inquiries ("Only inquiries" or "Both") and confirms each Reserved direct booking in Guesty; `terms.html` and `privacy.html` exist. Money goes to our Stripe account, so settling the manager's share happens outside Guesty.
 
+## Our database: guest details stay here
+
+Guest details never go to Guesty. `db.mjs` opens a SQLite database (Node's built-in `node:sqlite`, file `chat/data/app.db`, gitignored, mode 600) with versioned migrations:
+
+| Table | Holds | Kept |
+|---|---|---|
+| `guests` | name, email, mobile, marketing opt-in (one row per email) | while they have bookings |
+| `bookings` | reference, stay, dates, amount, status, Stripe payment id, Guesty reservation id | 6 years (accounting); unpaid or failed checkouts deleted after 7 days |
+| `reviews` | guest reviews and their approval status | until deleted in admin |
+| `handoffs` | "continue on your phone" details | 24 hours |
+
+What the other systems receive:
+- **Guesty:** a Reserved reservation for the dates with an anonymous guest, "Direct booking <reference>", and `GUESTY_GUEST_EMAIL`. Enough to block the calendar and Airbnb; nothing personal.
+- **Stripe:** the amount, the booking id and reference, and the cardholder name (needed for card checks). No email, phone or receipts; we send the confirmation email ourselves (`payments.mjs`, via Resend).
+
+`admin.html` shows bookings with guest details (search by name, email, phone or reference) and the review queue.
+
+**Production:** set `DATABASE_PATH` to a persistent disk and back the file up (e.g. a daily copy, or Litestream to object storage). Because Guesty has no contact details for direct bookings, check-in instructions for these guests must come from us or be sent by the manager using the admin page.
+
+## Continue on your phone
+
+On the checkout, between "Your details" and "Payment", guests can tap **Send me a link**. The details they entered are saved for 24 hours under a 12-character random id (`handoffs.mjs`) and the link `PUBLIC_URL/book.html?resume=<id>` is sent by email (Resend) and, for UK mobiles, SMS (Twilio). Opening it restores the stay and fills the form, so the guest only pays.
+
+- Abuse limits: 3 links per visitor per 10 minutes, 3 per email or phone number per day, SMS to UK mobiles (+447) only to block SMS-pumping fraud.
+- In Stripe test mode without Resend/Twilio keys, the email and SMS are printed to the server console instead of sent.
+
+## Guest reviews
+
+The Reviews section keeps the rating charts and replaces the old placeholder quotes with a "Write a review" form (star rating, first name, review, consent).
+
+- `POST /api/reviews` saves a review as **pending** in the database. Limits: 3 per visitor per 10 minutes, a hidden honeypot field for bots, 20 to 1,000 characters.
+- `admin.html` (password: `ADMIN_PASSWORD`) lists pending, approved and rejected reviews with Approve / Reject / Delete.
+- `GET /api/reviews?stay=` returns approved reviews only; the newest three show beside the chart.
+
 ## Test
 
 `npm test`: retrieval eval of 22 guest-style questions (free, no API calls). Run it after changing site content or `retrieval.mjs`.
@@ -68,6 +102,12 @@ Never put the API key in the HTML or JavaScript files; it stays on the server.
 | `GUESTY_CLIENT_ID` / `GUESTY_CLIENT_SECRET` | (none) | Guesty Booking Engine API key for live availability |
 | `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` | (none) | Our Stripe account; test keys never create real Guesty reservations |
 | `STRIPE_WEBHOOK_SECRET` | (none) | `whsec_...` for `/api/stripe-webhook` |
+| `PUBLIC_URL` | `http://localhost:PORT` | Site address used in emailed/texted links |
+| `RESEND_API_KEY` / `EMAIL_FROM` | (none) | Email for "continue on your phone" links |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_FROM` | (none) | SMS for the same links |
+| `ADMIN_PASSWORD` | (none) | Password for `admin.html` (bookings and review approval) |
+| `GUESTY_GUEST_EMAIL` | (none) | Placeholder email on direct bookings' Guesty reservations; required with live Stripe keys |
+| `DATABASE_PATH` | `chat/data/app.db` | SQLite file; on a persistent, backed-up disk in production |
 | `DIRECT_BOOKING` | off | `1` takes paid bookings on the site instead of sending guests to Airbnb |
 
 Limits: 20 messages per IP per 10 minutes, 800 characters per question, 12 turns of history, 2,048 output tokens per answer.

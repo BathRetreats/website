@@ -21,6 +21,7 @@
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.4c1.6.8 2.5 2.4 2.5 4.6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18h3"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
 </svg>
 
@@ -51,8 +52,19 @@
           <label class="co-field"><span>Last name</span><input name="lastName" autocomplete="family-name" required maxlength="60"></label>
         </div>
         <label class="co-field"><span>Email</span><input name="email" type="email" autocomplete="email" required maxlength="120"></label>
-        <label class="co-field"><span>Phone <em>(for check-in details)</em></span><input name="phone" type="tel" autocomplete="tel" maxlength="30"></label>
+        <label class="co-field"><span>Mobile <em>(for check-in details)</em></span><input name="phone" type="tel" autocomplete="tel" maxlength="30"></label>
       </fieldset>
+
+      <!-- shown when the server can send links (config.handoff) -->
+      <div class="co-handoff" id="coHandoff" hidden>
+        <svg class="i"><use href="#i-phone"/></svg>
+        <div>
+          <p class="co-handoff__title">Rather pay on your phone?</p>
+          <p class="small" id="coHandoffText">We'll send a link to your email and mobile with your details filled in, ready for Apple Pay or Google Pay.</p>
+        </div>
+        <button type="button" class="btn btn--light" id="coHandoffBtn">Send me a link</button>
+        <p class="co-error co-handoff__error" id="coHandoffError" role="alert"></p>
+      </div>
 
       <fieldset class="co-card">
         <legend>Payment</legend>
