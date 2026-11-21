@@ -13,7 +13,7 @@
 //
 // Guest details stay in our database (bookings.mjs). Stripe gets only our booking id and
 // reference; Guesty gets an anonymous placeholder guest named after the reference.
-// Test keys (sk_test_) never create real Guesty reservations: finalize fakes that step.
+// Test keys (sk_test_/rk_test_) never create real Guesty reservations: finalize fakes that step.
 
 import Stripe from "stripe";
 import * as guesty from "./guesty.mjs";
@@ -21,9 +21,10 @@ import * as bookings from "./bookings.mjs";
 import * as notify from "./notify.mjs";
 
 const { STRIPE_SECRET_KEY: SECRET = "", STRIPE_PUBLISHABLE_KEY: PUBLISHABLE = "", STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET = "" } = process.env;
-export const testMode = SECRET.startsWith("sk_test_");
+// A restricted key (rk_...) limited to PaymentIntents is recommended over the full secret key (sk_...).
+export const testMode = /^(sk|rk)_test_/.test(SECRET);
 // Both keys must come from the same Stripe account and the same mode.
-export const configured = /^sk_(test|live)_/.test(SECRET) && PUBLISHABLE.startsWith(testMode ? "pk_test_" : "pk_live_");
+export const configured = /^(sk|rk)_(test|live)_/.test(SECRET) && PUBLISHABLE.startsWith(testMode ? "pk_test_" : "pk_live_");
 export const publishableKey = PUBLISHABLE;
 export const webhookConfigured = Boolean(WEBHOOK_SECRET);
 const stripe = configured ? new Stripe(SECRET) : null;

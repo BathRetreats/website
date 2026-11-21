@@ -113,6 +113,11 @@ p { margin: 0; }
     linear-gradient(180deg, rgba(8,20,14,.55) 0%, rgba(8,20,14,.08) 30%, rgba(8,20,14,.7) 100%),
     url("images/manor/exterior.jpg") center 45% / cover no-repeat;
 }
+.hero__stage--abbey::before {
+  background:
+    linear-gradient(180deg, rgba(8,20,14,.55) 0%, rgba(8,20,14,.08) 30%, rgba(8,20,14,.7) 100%),
+    url("images/abbey/abbey-view.jpg") center / cover no-repeat;
+}
 @keyframes heroZoom { from { transform: scale(1.08); } to { transform: none; } }
 .hero__content { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -408,6 +413,7 @@ body.sheet-open .booking { z-index: 90; }
 /* cta */
 .cta { position: relative; overflow: hidden; margin: clamp(72px, 8vw, 120px) var(--gutter) 0; border-radius: 36px; color: #fff; text-align: center;
   background: linear-gradient(rgba(8,20,14,.5), rgba(8,20,14,.68)), url("images/cta-bath.jpg") center / cover no-repeat; }
+.cta--manor { background-image: linear-gradient(rgba(8,20,14,.5), rgba(8,20,14,.68)), url("images/manor/exterior.jpg"); background-position: center 45%; }
 .cta__inner { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: clamp(80px, 11vw, 160px) 24px; }
 .cta h2 { max-width: 12em; font-size: clamp(32px, 5vw, 68px); font-weight: 500; letter-spacing: -0.04em; }
 .cta p { font-size: 16px; color: rgba(255,255,255,.88); }

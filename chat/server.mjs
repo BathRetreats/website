@@ -12,7 +12,7 @@
 //   LOG_QUESTIONS=1      also log guest questions (off by default for privacy)
 //   GUESTY_CLIENT_ID     Guesty Booking Engine API key, for live availability on the booking calendar
 //   GUESTY_CLIENT_SECRET
-//   STRIPE_SECRET_KEY / STRIPE_PUBLISHABLE_KEY  our Stripe account (sk_test_/pk_test_ for testing)
+//   STRIPE_SECRET_KEY / STRIPE_PUBLISHABLE_KEY  the client's Stripe account: restricted key rk_... (or sk_...) + pk_...
 //   STRIPE_WEBHOOK_SECRET  whsec_... for /api/stripe-webhook (finishes bookings if the guest's browser drops)
 //   DIRECT_BOOKING=1     take paid bookings on the site (otherwise guests are sent to Airbnb)
 //   ADMIN_PASSWORD       password for admin.html (bookings and review approval)
