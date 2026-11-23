@@ -60,7 +60,6 @@
     <li><a href="abbey.html">Abbey Views</a></li>
     <li><a href="manor.html">Longscroft Manor</a></li>
     <li><a href="#explore">Explore Bath</a></li>
-    <li><a href="#reviews">Reviews</a></li>
     <li><a href="#faq">Guest Info</a></li>
   </ul>
   <a href="#book" class="btn btn--lime nav__cta" data-book>Book Now</a>
@@ -223,7 +222,7 @@
 <!-- ============ STATS ============ -->
 <section class="stats" aria-label="Key figures">
   <div><strong>4.89</strong><span>Average rating across both stays</span></div>
-  <div><strong data-count="281">281</strong><span>Guest reviews</span></div>
+  <div><strong data-count="281">281</strong><span>Guest reviews on Airbnb</span></div>
   <div><strong>2&ndash;12</strong><span>Guests, from couples to groups</span></div>
   <div><strong>16:00</strong><span>Self check-in at both stays</span></div>
 </section>
@@ -319,84 +318,6 @@
   <p class="note">Times are approximate. Opening times and prices change, so check each attraction before you go.</p>
 </section>
 
-<!-- ============ REVIEWS ============ -->
-<section class="section" id="reviews">
-  <div class="section__head section__head--split">
-    <div>
-      <span class="eyebrow">Reviews</span>
-      <h2>What our guests say.</h2>
-    </div>
-    <div class="seg seg--lg" role="tablist" aria-label="Choose property">
-      <button type="button" role="tab" data-rtab="abbey" aria-selected="true">Abbey Views</button>
-      <button type="button" role="tab" data-rtab="manor" aria-selected="false">Longscroft Manor</button>
-    </div>
-  </div>
-
-  <div class="reviews">
-    <div class="scores" data-stay="abbey">
-      <div class="scores__top"><strong>4.91</strong><span>Guest favourite<br><small>from 218 reviews</small></span></div>
-      <ul class="bars">
-        <li><span>Cleanliness</span><i style="--v:100%"></i><b>5.0</b></li>
-        <li><span>Location</span><i style="--v:100%"></i><b>5.0</b></li>
-        <li><span>Accuracy</span><i style="--v:98%"></i><b>4.9</b></li>
-        <li><span>Check-in</span><i style="--v:98%"></i><b>4.9</b></li>
-        <li><span>Communication</span><i style="--v:98%"></i><b>4.9</b></li>
-        <li><span>Value</span><i style="--v:98%"></i><b>4.9</b></li>
-      </ul>
-      <p class="mentions">Most mentioned: <b>Location</b> (186), <b>View</b> (121), <b>Cleanliness</b> (72), <b>Hospitality</b> (64)</p>
-    </div>
-    <div class="scores" data-stay="manor" hidden>
-      <div class="scores__top"><strong>4.81</strong><span>Guest rating<br><small>from 63 reviews</small></span></div>
-      <ul class="bars">
-        <li><span>Communication</span><i style="--v:100%"></i><b>5.0</b></li>
-        <li><span>Check-in</span><i style="--v:98%"></i><b>4.9</b></li>
-        <li><span>Cleanliness</span><i style="--v:96%"></i><b>4.8</b></li>
-        <li><span>Accuracy</span><i style="--v:96%"></i><b>4.8</b></li>
-        <li><span>Location</span><i style="--v:96%"></i><b>4.8</b></li>
-        <li><span>Value</span><i style="--v:94%"></i><b>4.7</b></li>
-      </ul>
-      <p class="mentions">Most mentioned: <b>Hospitality</b> (28), <b>Location</b> (23), <b>Indoor spaces</b> (17), <b>Family</b> (14)</p>
-    </div>
-
-    <!-- Guest reviews: sent with the form below, shown here only after approval on admin.html -->
-    <div class="greviews" data-reviews>
-      <div class="greviews__list" aria-live="polite"></div>
-      <div class="greviews__intro">
-        <svg class="i quote"><use href="#i-quote"/></svg>
-        <p class="greviews__title">Stayed with us? We'd love to hear about it.</p>
-        <p class="small">Share a few words about your stay to help future guests. Reviews appear here once our team has checked them.</p>
-        <button type="button" class="btn btn--dark" data-review-open>Write a review</button>
-      </div>
-      <form class="rform" novalidate hidden>
-        <p class="rform__for">Your review of <b data-review-stay></b></p>
-        <fieldset class="stars">
-          <legend>Your rating</legend>
-          <div class="stars__row">
-            <input type="radio" name="rating" value="5" id="r5" required><label for="r5" title="5 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">5 stars</span></label>
-            <input type="radio" name="rating" value="4" id="r4"><label for="r4" title="4 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">4 stars</span></label>
-            <input type="radio" name="rating" value="3" id="r3"><label for="r3" title="3 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">3 stars</span></label>
-            <input type="radio" name="rating" value="2" id="r2"><label for="r2" title="2 stars"><svg class="i"><use href="#i-star"/></svg><span class="sr">2 stars</span></label>
-            <input type="radio" name="rating" value="1" id="r1"><label for="r1" title="1 star"><svg class="i"><use href="#i-star"/></svg><span class="sr">1 star</span></label>
-          </div>
-        </fieldset>
-        <label class="co-field"><span>Your first name</span><input name="name" maxlength="40" autocomplete="given-name" required></label>
-        <label class="co-field"><span>Your review</span><textarea name="text" rows="4" minlength="20" maxlength="1000" required></textarea></label>
-        <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
-        <label class="co-check"><input type="checkbox" name="consent" required> <span>I agree to my first name and review being shown on this website.</span></label>
-        <p class="co-error" role="alert"></p>
-        <div class="rform__actions">
-          <button type="submit" class="btn btn--dark">Submit review</button>
-          <button type="button" class="linkbtn" data-review-cancel>Cancel</button>
-        </div>
-      </form>
-      <div class="rform__done" hidden>
-        <p class="greviews__title">Thank you!</p>
-        <p class="small">Your review has been sent and will appear here once it's been checked.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ FAQ ============ -->
 <section class="section faq" id="faq">
   <div class="section__head">
@@ -489,7 +410,7 @@
   <div class="footer__bar">
     <nav aria-label="Footer"><a href="abbey.html">Abbey Views</a><a href="manor.html">Longscroft Manor</a><a href="#explore">Explore Bath</a></nav>
     <span class="nav__logo">Bath Retreats</span>
-    <nav aria-label="Footer secondary"><a href="#reviews">Reviews</a><a href="#faq">Guest Info</a><a href="#book" data-book>Book</a></nav>
+    <nav aria-label="Footer secondary"><a href="#faq">Guest Info</a><a href="#book" data-book>Book</a></nav>
   </div>
   <div class="footer__legal">
     <span>&copy; 2026 Bath Retreats. All rights reserved.</span>
@@ -512,6 +433,7 @@
 </div>
 
 <script src="script.js" defer></script>
+<script src="legal-modal.js" defer></script>
 <script src="chat-widget.js" defer data-endpoint="/api/chat"></script>
 </body>
 </html>

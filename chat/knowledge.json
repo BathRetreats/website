@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-11-06T20:02:34.500Z",
+  "builtAt": "2026-11-23T06:02:05.466Z",
   "pages": [
     "index.html",
     "abbey.html",
@@ -161,20 +161,6 @@
       "text": "Attractions listed on the site: Bath Abbey, The Pump Room, The Roman Baths, Thermae Bath Spa, Sally Lunn's, Theatre Royal Bath, Parade Gardens & the River Avon, Pulteney Bridge, Jane Austen Centre, Green Park Station Market, The Royal Crescent & The Circus, Prior Park Landscape Garden, Bradford-on-Avon, Kennet & Avon Canal, Iford Manor Gardens, Lacock. Tap any place to open it in Google Maps. Walking times are from Abbey Views. Times are approximate. Opening times and prices change, so check each attraction before you go.",
       "stay": "both",
       "url": "index.html#explore"
-    },
-    {
-      "id": "index.html#abbey-views-guest-ratings-and-review-scores",
-      "title": "Abbey Views: guest ratings and review scores",
-      "text": "Abbey Views overall rating 4.91 out of 5, from 218 reviews. Category scores: Cleanliness 5.0, Location 5.0, Accuracy 4.9, Check-in 4.9, Communication 4.9, Value 4.9. Most mentioned: Location (186), View (121), Cleanliness (72), Hospitality (64).",
-      "stay": "abbey",
-      "url": "abbey.html#reviews"
-    },
-    {
-      "id": "index.html#longscroft-manor-guest-ratings-and-review-scores",
-      "title": "Longscroft Manor: guest ratings and review scores",
-      "text": "Longscroft Manor overall rating 4.81 out of 5, from 63 reviews. Category scores: Communication 5.0, Check-in 4.9, Cleanliness 4.8, Accuracy 4.8, Location 4.8, Value 4.7. Most mentioned: Hospitality (28), Location (23), Indoor spaces (17), Family (14).",
-      "stay": "manor",
-      "url": "manor.html#reviews"
     },
     {
       "id": "index.html#faq-both-stays-what-time-are-check-in-and-check-out",

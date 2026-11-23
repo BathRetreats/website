@@ -15,7 +15,11 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const BASE = "https://booking.guesty.com";
-const TOKEN_FILE = path.join(here, ".guesty-token.json");
+// Kept beside the database when DATABASE_PATH is set, so it survives deploys on hosts that
+// only persist a mounted disk (otherwise every deploy would use up one of the day's tokens).
+const TOKEN_FILE = process.env.DATABASE_PATH
+  ? path.join(path.dirname(process.env.DATABASE_PATH), ".guesty-token.json")
+  : path.join(here, ".guesty-token.json");
 const CALENDAR_TTL_MS = 5 * 60 * 1000;
 const DAYS_AHEAD = 365;
 

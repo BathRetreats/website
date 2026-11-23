@@ -332,7 +332,6 @@
     if (t.closest("[data-clear]")) { state.start = state.end = state.hover = null; state.edge = "in"; setHint(); renderCal(); return sync(); }
 
     if ((el = t.closest(".tab[data-filter]"))) return filterPlaces(el);
-    if ((el = t.closest("[data-rtab]"))) return showReviews(el.dataset.rtab);
     if ((el = t.closest(".mosaic figure, .mosaic__all"))) {
       const gallery = el.closest(".mosaic");
       return openLightbox(gallery, el.matches("figure") ? $$("figure", gallery).indexOf(el) : 0);
@@ -397,76 +396,6 @@
     if (img.complete && !img.naturalWidth) dropBroken(img);
     else img.addEventListener("error", () => dropBroken(img), { once: true });
   });
-
-  /* =========================================================
-     Reviews: property tabs, approved guest reviews, review form
-     ========================================================= */
-  const scorePanels = $$(".scores"), greviews = $("[data-reviews]");
-  const reviewLists = {}; // stay -> promise of approved reviews
-  const fmtReviewDate = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" });
-  let reviewStay = PAGE_STAY || "abbey";
-
-  function showReviews(stay) {
-    reviewStay = stay;
-    $$("[data-rtab]").forEach(b => b.setAttribute("aria-selected", b.dataset.rtab === stay));
-    scorePanels.forEach(p => { p.hidden = p.dataset.stay !== stay; });
-    if (!greviews) return;
-    $("[data-review-stay]", greviews).textContent = STAYS[stay].name;
-    renderGuestReviews();
-  }
-  async function renderGuestReviews() {
-    const stay = reviewStay;
-    reviewLists[stay] ??= fetch(`${API}/reviews?stay=${stay}`).then(r => r.ok ? r.json() : { reviews: [] }).then(d => d.reviews).catch(() => []);
-    const list = await reviewLists[stay];
-    if (stay !== reviewStay) return; // the guest switched tabs meanwhile
-    $(".greviews__list", greviews).replaceChildren(...list.slice(0, 3).map(r => {
-      // textContent only: review text comes from the public, never insert it as HTML
-      const q = document.createElement("blockquote");
-      q.className = "greview";
-      q.innerHTML = `<span class="greview__stars" aria-label="${r.rating} out of 5 stars">${icon("star").repeat(r.rating)}</span><p></p><footer><b></b><span></span></footer>`;
-      $("p", q).textContent = r.text;
-      $("b", q).textContent = r.name;
-      $("footer span", q).textContent = fmtReviewDate.format(parse(r.date));
-      return q;
-    }));
-  }
-  function reviewForm(open) {
-    const form = $(".rform", greviews);
-    form.hidden = !open;
-    $(".greviews__intro", greviews).hidden = open;
-    $(".rform__done", greviews).hidden = true;
-    if (open) { $(".co-error", form).textContent = ""; $("input[name=rating]", form).focus(); }
-  }
-  greviews?.addEventListener("click", e => {
-    if (e.target.closest("[data-review-open]")) reviewForm(true);
-    if (e.target.closest("[data-review-cancel]")) reviewForm(false);
-  });
-  greviews?.addEventListener("input", () => { $(".rform .co-error", greviews).textContent = ""; });
-  greviews?.addEventListener("submit", async e => {
-    e.preventDefault();
-    const form = e.target, err = $(".co-error", form), btn = $("button[type=submit]", form);
-    const f = Object.fromEntries(new FormData(form));
-    const problem = !f.rating ? "Please choose a star rating."
-      : !f.name.trim() ? "Please add your first name."
-      : f.text.trim().length < 20 ? "Please write at least 20 characters."
-      : !f.consent ? "Please agree to your review being shown on the website." : "";
-    if (problem) { err.textContent = problem; return; }
-    btn.disabled = true;
-    err.textContent = "";
-    try {
-      const res = await fetch(`${API}/reviews`, { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stay: reviewStay, rating: Number(f.rating), name: f.name.trim(), text: f.text.trim(), consent: true, website: f.website }) });
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Something went wrong. Please try again.");
-      form.reset();
-      form.hidden = true;
-      $(".rform__done", greviews).hidden = false;
-    } catch (ex) {
-      err.textContent = ex.message;
-    } finally {
-      btn.disabled = false;
-    }
-  });
-  showReviews(reviewStay);
 
   /* =========================================================
      Lightbox (per-property galleries, keyboard + swipe)
@@ -556,7 +485,7 @@
     }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
 
     $$("[data-count]").forEach(el => io.observe(el));
-    $$(".section__head, .stay, .stats > div, .property__head, .property__grid > *, .tabs, .place, .reviews > *, .faq__group, .cta__inner, .footer__top")
+    $$(".section__head, .stay, .stats > div, .property__head, .property__grid > *, .tabs, .place, .faq__group, .cta__inner, .footer__top")
       .forEach((el, i) => { el.classList.add("reveal"); el.style.transitionDelay = `${(i % 3) * 80}ms`; io.observe(el); });
   }
 
